@@ -1,0 +1,226 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Swagger Application",
+        "description": "API documentation for My Application",
+        "contact": {
+            "email": "administrator@innovacion.gob.sv"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Iniciar sesion",
+                "operationId": "8b5a115472e8bf2c21790158a641e644",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "String",
+                                        "example": "administrador@innovacion.gob.sv"
+                                    },
+                                    "password": {
+                                        "type": "String",
+                                        "example": "Admin123$"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Se inicio sesión"
+                    },
+                    "400": {
+                        "description": "Datos inválidos o petición incorrecta"
+                    },
+                    "401": {
+                        "description": "No autorizado, se requiere token"
+                    },
+                    "500": {
+                        "description": "Error interno del servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Cerrar sesión",
+                "operationId": "a9c7f1480ba3abf89942431603e6a995",
+                "responses": {
+                    "201": {
+                        "description": "Sesion cerrada"
+                    },
+                    "400": {
+                        "description": "Datos inválidos o petición incorrecta"
+                    },
+                    "401": {
+                        "description": "No autorizado, se requiere token"
+                    },
+                    "500": {
+                        "description": "Error interno del servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/users/permissions": {
+            "post": {
+                "tags": [
+                    "Permisos"
+                ],
+                "summary": "Crea nuevos permisos",
+                "operationId": "7e4c3b1c3ed79a111f59823a78274484",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "permissions"
+                                ],
+                                "properties": {
+                                    "permissions": {
+                                        "type": "Array",
+                                        "example": [
+                                            "permiso1",
+                                            "permiso2"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Permisos creados con éxito"
+                    },
+                    "400": {
+                        "description": "Datos inválidos o petición incorrecta"
+                    },
+                    "401": {
+                        "description": "No autorizado, se requiere token"
+                    },
+                    "500": {
+                        "description": "Error interno del servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/users/role": {
+            "post": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Crea nuevos roles",
+                "operationId": "75efd43c35ee7ca74c0dcc21501133eb",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "role",
+                                    "permissions"
+                                ],
+                                "properties": {
+                                    "role": {
+                                        "type": "String",
+                                        "example": "Role name"
+                                    },
+                                    "permissions": {
+                                        "type": "Array",
+                                        "example": [
+                                            "permiso1",
+                                            "permiso2"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Permisos creados con éxito"
+                    },
+                    "400": {
+                        "description": "Datos inválidos o petición incorrecta"
+                    },
+                    "401": {
+                        "description": "No autorizado, se requiere token"
+                    },
+                    "500": {
+                        "description": "Error interno del servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Enter your JWT token in the format Bearer {token}",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Auth"
+        },
+        {
+            "name": "Permisos",
+            "description": "Permisos"
+        },
+        {
+            "name": "Roles",
+            "description": "Roles"
+        }
+    ]
+}
