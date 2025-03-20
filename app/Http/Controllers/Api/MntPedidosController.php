@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePedidoRequest;
 use App\Http\Response\ApiResponse;
+use App\Models\MntCliente;
 use App\Models\MntDetallePedidos;
 use App\Models\MntPedidos;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Models\User;
 
 class MntPedidosController extends Controller
 {
@@ -101,19 +103,22 @@ class MntPedidosController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'client_id' => 'required|exists:mnt_clientes,id',
+                'client_id'    => 'required|exists:mnt_clientes,id',
                 'categoria_id' => 'nullable|exists:ctl_categoria,id',
-                'producto_id' => 'nullable|exists:ctl_productos,id',
+                'producto_id'  => 'nullable|exists:ctl_productos,id',
             ], [
-                'client_id.required' => 'El ID del cliente es obligatorio',
-                'client_id.exists' => 'El cliente debe estar registrado',
-                'categoria_id.exists' => 'La categoría debe estar registrada',
-                'producto_id.exists' => 'El producto debe estar registrado',
+                'client_id.required'   => 'El ID del cliente es obligatorio',
+                'client_id.exists'     => 'El cliente debe estar registrado',
+                'categoria_id.exists'  => 'La categoría debe estar registrada',
+                'producto_id.exists'   => 'El producto debe estar registrado',
             ]);
 
             if ($validator->fails()) {
                 return ApiResponse::error($validator->errors(), 422);
             }
+
+            // Obtener la información del cliente
+            $cliente = MntCliente::find($request->client_id);
 
             // Iniciar la consulta con el cliente
             $query = MntPedidos::with([
@@ -124,12 +129,10 @@ class MntPedidosController extends Controller
             // Aplicar filtros en la relación detallePedido
             if ($request->filled('categoria_id') || $request->filled('producto_id')) {
                 $query->whereHas('detallePedido.producto', function ($q) use ($request) {
-                    // Filtrar por producto si se proporciona un ID de producto
                     if ($request->filled('producto_id')) {
                         $q->where('id', $request->producto_id);
                     }
 
-                    // Filtrar por categoría si se proporciona un ID de categoría
                     if ($request->filled('categoria_id')) {
                         $q->whereHas('categoria', function ($qc) use ($request) {
                             $qc->where('id', $request->categoria_id);
@@ -140,9 +143,18 @@ class MntPedidosController extends Controller
 
             $pedidos = $query->paginate(10);
 
-            return ApiResponse::success('Pedidos filtrados', 200, $pedidos);
+            return ApiResponse::success('Pedidos filtrados', 200, [
+                'cliente' => $cliente,
+                'pedidos' => $pedidos
+            ]);
         } catch (\Exception $e) {
-            return ApiResponse::error('Error al filtrar los pedidos: ' . $e->getMessage(), 422);
+            return ApiResponse::error(
+                'Error al filtrar los pedidos: ' . $e->getMessage(),
+                422
+            );
         }
     }
+
+    //127.0.0.1:8000/api/pedidos/filter?client_id=1
+    //127.0.0.1:8000/api/pedidos/filter?client_id=1&categoria_id=2&producto_id=1
 }
